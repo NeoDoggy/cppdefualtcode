@@ -135,7 +135,7 @@ struct bipmatch
 	{
 		int ans=0;
 		memset(m,-1,sizeof(m));
-		for(int i=0;i<x;i++)
+		for(int i=1;i<=x;i++)
 		{
 			memset(v,false,sizeof(v));
 			ans+=dfs(i);
