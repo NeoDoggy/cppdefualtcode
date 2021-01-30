@@ -107,6 +107,130 @@ struct dinic
 	}
 };
 
+struct ISAP
+{
+	static const int INFN=0x3f3f3f3f;
+	static const int N=206;
+
+	struct edge
+	{
+		int to,cap,rev; //to graph end //reverse vector edge
+		edge(){}
+		edge(int TO,int CAP,int REV):to(TO),cap(CAP),rev(REV){}
+	};
+
+	vector<edge> g[N];
+
+	void add_edge(int from ,int to ,int cap)
+	{
+		g[from].pb(edge(to,cap,(int)g[to].size()));
+		g[to].pb(edge(from,0,(int)g[from].size()-1));
+	}
+
+	int n,s,t;
+
+	void init(int _n,int _s,int _t)
+	{
+		n=_n,s=_s,t=_t;
+		g->clear();
+	}
+
+	int dis[N],iter[N],gap[N];
+	bool vis[N];
+	void bfs()
+	{
+		memset(dis,INFN,sizeof(dis));
+		dis[t]=0;
+		queue<int> que;
+		que.push(t);
+		while(!que.empty())
+		{
+			int tmp=que.front();
+			que.pop();
+			for(edge e:g[tmp])
+			{
+				if(w.cap==0&&dis[e.to]==INFN)
+				{
+					dis[e.to]=dis[tmp]+1;
+					que.push(e.to);
+				}
+			}
+		}
+		if(dis[s]==INFN)
+			return;
+		memset(vis,0,sizeof(vis));
+		vis[s]=1;
+		que.push(s);
+		while(!que.empty())
+		{
+			int tmp=que.front();
+			que.pop();
+			if(dis!=INFN)
+				gap[dis[tmp]]++;
+			for(edge e:g[tmp])
+			{
+				if(e.cap>0&&!vis[e.to])
+				{
+					vis[e.to]=1;
+					que.push(e.to);
+				}
+			}
+		}
+	}
+	bool ok;
+	int dfs(int now,int flow)
+	{
+		if(now==t)
+			return flow;
+		for(int &i = iter[now];i<(int)g[now].size();++i)
+		{
+			edge &e=g[now][i];
+			if(e.cap>0&&dis[e.to]+1==dis[now])
+			{
+				int ret=dfs(e.to,min(e.cap,flow));
+				if(ret>0)
+				{
+					e.cap-=ret;
+					g[e.to][e.rev].cap+=ret;
+					return ret;
+				}
+			}
+		}
+		if(!ok)
+			return 0;
+		--gap[dis[now]];
+		if(gap[dis[now]]==0)
+		{
+			ok=0;
+			return 0;
+		}
+		dis[now]=INFN;
+		for(int i=0;i<(int)g[now].size();++i)
+		{
+			if(g[now][i].cap>0)
+			{
+				dis[now]=min(dis[now],dis[g[now][i].to]+1);
+			}
+		}
+		if(dis[now]!=INFN)
+			gap[dis[now]]++;
+		iter[now]=0;
+		return 0;
+	}
+
+	int flow()
+	{
+		int ret=0;
+		bfs();
+		ok=1;
+		while(dis[s]<n&&ok)
+		{
+			ret+=dfs(s,INFN);
+		}
+		return ret;
+	}
+};
+
 struct bipmatch
 {
 	static const int N=1e4+10;
