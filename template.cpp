@@ -149,7 +149,7 @@ struct ISAP
 			que.pop();
 			for(edge e:g[tmp])
 			{
-				if(w.cap==0&&dis[e.to]==INFN)
+				if(e.cap==0&&dis[e.to]==INFN)
 				{
 					dis[e.to]=dis[tmp]+1;
 					que.push(e.to);
@@ -165,7 +165,7 @@ struct ISAP
 		{
 			int tmp=que.front();
 			que.pop();
-			if(dis!=INFN)
+			if(dis[tmp]!=INFN)
 				gap[dis[tmp]]++;
 			for(edge e:g[tmp])
 			{
