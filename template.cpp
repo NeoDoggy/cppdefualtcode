@@ -104,6 +104,7 @@ struct dinic
 				ret+=tmp;//success
 			}
 		}
+		return ret;
 	}
 };
 
